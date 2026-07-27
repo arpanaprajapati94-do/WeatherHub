@@ -1,32 +1,24 @@
-# WeatherHub
+# WeatherHub 🌤️
 
-WeatherHub is a modern mini MERN stack weather application with authentication, city search, favourites, and search history.
+MERN Stack Weather Application with real-time weather data, authentication, favourites and search history.
+
+## Live Demo
+Frontend: https://weather-hub-nine.vercel.app
+
+Backend: https://weatherhub-mdip.onrender.com
 
 ## Features
-- User registration and login with JWT
-- Search weather by city
-- Save and remove favourite cities
-- View recent search history
-- Responsive glassmorphism UI with Tailwind CSS
+- User Authentication (JWT)
+- Search Weather by City
+- Favourite Cities
+- Search History
+- Responsive UI
 
 ## Tech Stack
 - React + Vite
-- Node.js + Express
-- MongoDB + Mongoose
 - Tailwind CSS
-- JWT Authentication
+- Node.js + Express
+- MongoDB Atlas
 
-## Setup
-1. Install dependencies:
-   - `npm install`
-   - `cd client && npm install`
-2. Create a `.env` file using the provided `.env.example` template.
-3. Start MongoDB locally.
-4. Run the backend:
-   - `npm start`
-5. Run the frontend:
-   - `cd client && npm run dev`
-
-## Environment
-- Backend uses `PORT`, `MONGO_URI`, `JWT_SECRET`, `WEATHER_API_KEY`, and `CLIENT_URL`.
-- The app includes mock weather data if no API key is provided.
+## Author
+Arpana B. Prajapati
