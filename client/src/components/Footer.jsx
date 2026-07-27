@@ -20,11 +20,11 @@ const Footer = () => {
               Your personal weather companion. Real-time weather updates, forecasts, and more — all in a beautiful, modern interface.
             </p>
             <div className="flex items-center gap-3">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://github.com/arpanaprajapati94-do?utm_source=chatgpt.com" target="_blank" rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-500 transition-all">
                 <FiGithub className="w-4 h-4" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
+              <a href="https://linkedin.com/in/arpana-b-prajapati-4239a235b" target="_blank" rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-500 transition-all">
                 <FiLinkedin className="w-4 h-4" />
               </a>
