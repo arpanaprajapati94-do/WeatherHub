@@ -40,6 +40,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [recentSearches, setRecentSearches] = useState([]);
   const [showRecent, setShowRecent] = useState(false);
+  const [suppressDropdown, setSuppressDropdown] = useState(false);
 
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -114,6 +115,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
         e.preventDefault();
         setIsOpen(false);
         setShowRecent(false);
+        setSuppressDropdown(true);
         setActiveIndex(-1);
         inputRef.current?.blur();
         break;
@@ -127,6 +129,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
     setQuery(city);
     setIsOpen(false);
     setShowRecent(false);
+    setSuppressDropdown(true);
     setActiveIndex(-1);
     saveRecentSearch(city);
     onSearch(city);
@@ -140,6 +143,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
     setQuery(targetCity);
     setIsOpen(false);
     setShowRecent(false);
+    setSuppressDropdown(true);
     onSearch(targetCity);
   };
 
@@ -159,6 +163,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
       ) {
         setIsOpen(false);
         setShowRecent(false);
+        setSuppressDropdown(true);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -176,6 +181,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setQuery(value);
+    setSuppressDropdown(false);
     if (value.trim()) {
       setIsOpen(true);
       setShowRecent(false);
@@ -187,7 +193,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
   };
 
   // Determine what to show in the dropdown
-  const showDropdown = isOpen || showRecent || (hasQuery && filteredCities.length > 0);
+  const showDropdown = !suppressDropdown && (isOpen || showRecent || (hasQuery && filteredCities.length > 0));
   const itemsToShow = hasQuery ? filteredCities : (showRecent ? recentSearches : []);
   const dropdownLabel = hasQuery
     ? `Cities (${filteredCities.length} found)`

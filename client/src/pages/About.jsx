@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FiShield, FiZap, FiCloud, FiServer, FiDatabase, FiLock } from 'react-icons/fi';
+import Logo from '../components/Logo';
 
 const About = () => {
   const techStack = [
@@ -45,9 +46,7 @@ const About = () => {
             transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
             className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 mb-4"
           >
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79z"/>
-            </svg>
+            <Logo size={40} showText={false} />
           </motion.div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             About <span className="gradient-text">WeatherHub</span>

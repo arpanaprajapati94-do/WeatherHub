@@ -5,6 +5,7 @@ import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ThemeToggle';
+import Logo from './Logo';
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -20,14 +21,18 @@ const Navbar = () => {
     ? [
         { to: '/dashboard', label: 'Dashboard' },
         { to: '/favourites', label: 'Favourites' },
+        { to: '/calendar', label: 'Calendar' },
       ]
     : [
         { to: '/', label: 'Home' },
         { to: '/about', label: 'About' },
+        { to: '/calendar', label: 'Calendar' },
         { to: '/contact', label: 'Contact' },
       ];
 
-  const isActive = (path) => location.pathname === path;
+  // Active link matching — exact match, plus nested-route prefix match for "/"
+  const isActive = (path) =>
+    path === '/' ? location.pathname === '/' : location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const handleLogout = () => {
     logout();
@@ -41,20 +46,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 group" onClick={closeMenu}>
-            <motion.div
-              whileHover={{ rotate: 10 }}
-              className="relative"
-            >
-              <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
-              </svg>
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full"
-              />
-            </motion.div>
-            <span className="text-xl font-bold gradient-text">WeatherHub</span>
+            <Logo size={34} />
           </Link>
 
           {/* Desktop Navigation */}
@@ -198,3 +190,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
