@@ -5,8 +5,12 @@ import axios from 'axios';
  * Automatically attaches JWT token and handles errors
  */
 
+// Fall back to same-origin `/api` when VITE_API_URL is not set.
+// In development, Vite's proxy forwards `/api` → http://localhost:5000.
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },

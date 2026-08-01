@@ -36,9 +36,11 @@ const addFavourite = async (req, res, next) => {
     }
 
     // Check if already favourited (handled by unique index, but better UX with custom message)
+    // Escape regex special characters so city names like "St. Louis" match literally
+    const escapedCity = city.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const existing = await Favourite.findOne({
       user: req.user.id,
-      city: { $regex: new RegExp('^' + city.trim() + '$', 'i') },
+      city: { $regex: new RegExp('^' + escapedCity + '$', 'i') },
     });
 
     if (existing) {
@@ -52,8 +54,9 @@ const addFavourite = async (req, res, next) => {
       user: req.user.id,
       city: city.trim(),
       country: country || '',
-      latitude: latitude || undefined,
-      longitude: longitude || undefined,
+      // Use !== undefined so a valid coordinate of 0 (equator/prime meridian) is preserved
+      latitude: latitude !== undefined ? latitude : undefined,
+      longitude: longitude !== undefined ? longitude : undefined,
     });
 
     res.status(201).json({

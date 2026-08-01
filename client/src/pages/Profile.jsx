@@ -98,7 +98,17 @@ const Profile = () => {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const date = new Date(dateStr);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
+  const formatHistoryDate = (entry) => {
+    const raw = entry?.timestamp || entry?.createdAt || entry?.date;
+    if (!raw) return 'N/A';
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleString();
   };
 
   const memberSince = user?.createdAt ? formatDate(user.createdAt) : user?.date ? formatDate(user.date) : 'N/A';
@@ -299,7 +309,7 @@ const Profile = () => {
                             </div>
                           </div>
                           <p className="text-xs text-gray-400 dark:text-gray-500">
-                            {new Date(entry.timestamp || entry.createdAt || entry.date).toLocaleString()}
+                            {formatHistoryDate(entry)}
                           </p>
                         </div>
                       ))}

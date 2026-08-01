@@ -9,8 +9,20 @@ const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
+    // Normalize inputs
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const normalizedName = (name || '').trim();
+
+    // Validate required fields (Mongoose will also validate, but fail fast for better UX)
+    if (!normalizedName || !normalizedEmail || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide name, email, and password.',
+      });
+    }
+
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -19,7 +31,7 @@ const register = async (req, res, next) => {
     }
 
     // Create new user
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name: normalizedName, email: normalizedEmail, password });
 
     // Generate token
     const token = user.generateToken();
@@ -46,8 +58,11 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    // Normalize email so "User@Example.com " matches a stored "user@example.com"
+    const normalizedEmail = (email || '').trim().toLowerCase();
+
     // Validate input
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({
         success: false,
         message: 'Please provide both email and password.',
@@ -55,7 +70,7 @@ const login = async (req, res, next) => {
     }
 
     // Find user and include password field
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (!user) {
       return res.status(401).json({

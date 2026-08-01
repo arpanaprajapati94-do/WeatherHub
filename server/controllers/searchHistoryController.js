@@ -41,7 +41,8 @@ const addToHistory = async (req, res, next) => {
       user: req.user.id,
       city: city.trim(),
       country: country || '',
-      temperature: temperature || null,
+      // Use ?? so a valid temperature of 0°C is preserved
+      temperature: temperature ?? null,
       weatherDescription: weatherDescription || '',
       weatherIcon: weatherIcon || '',
     });

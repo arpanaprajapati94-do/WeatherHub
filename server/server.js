@@ -23,6 +23,9 @@ const searchHistoryRoutes = require('./routes/searchHistory');
 // Initialize Express app
 const app = express();
 
+// Security hardening — hide framework fingerprint
+app.disable('x-powered-by');
+
 // ============================================
 // Middleware Setup
 // ============================================

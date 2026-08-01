@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext();
@@ -15,9 +15,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('weatherhub-token'));
   const [loading, setLoading] = useState(true);
+  const hasLoadedOnMount = useRef(false);
 
-  // Load user on mount if token exists
+  // Load user on mount if a token already exists.
+  // login()/register() set user directly, so we avoid re-fetching /auth/me
+  // on every token change (prevents a redundant duplicate request).
   useEffect(() => {
+    if (hasLoadedOnMount.current) return;
+    hasLoadedOnMount.current = true;
+
     const loadUser = async () => {
       if (!token) {
         setLoading(false);

@@ -22,7 +22,9 @@ const HighlightMatch = ({ text, query }) => {
   return (
     <span>
       {parts.map((part, i) =>
-        regex.test(part) ? (
+        // split() with a capture group places matched segments at odd indices.
+        // This avoids the stateful lastIndex bug of .test() on a /g regex.
+        i % 2 === 1 ? (
           <span key={i} className="text-blue-600 dark:text-blue-400 font-bold">{part}</span>
         ) : (
           <span key={i}>{part}</span>

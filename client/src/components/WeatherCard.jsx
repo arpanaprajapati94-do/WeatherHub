@@ -20,6 +20,7 @@ const WeatherCard = ({ weather, isFavourite = false, onToggleFavourite, onRefres
   };
 
   const getWindDirection = (deg) => {
+    if (typeof deg !== 'number' || Number.isNaN(deg)) return '--';
     const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
     return directions[Math.round(deg / 45) % 8];
   };
@@ -159,7 +160,8 @@ const WeatherCard = ({ weather, isFavourite = false, onToggleFavourite, onRefres
         <DetailItem label="Cloudiness" value={`${clouds}%`} icon={
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
         } />
-        <DetailItem label="Coordinates" value={`${coordinates?.lat?.toFixed(2)}, ${coordinates?.lon?.toFixed(2)}`} icon={
+        <DetailItem label="Coordinates" value={coordinates?.lat != null && coordinates?.lon != null
+          ? `${coordinates.lat.toFixed(2)}, ${coordinates.lon.toFixed(2)}` : 'N/A'} icon={
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
         } />
         <DetailItem label="Sunrise" value={sunrise ? formatTime(sunrise, weather.timezone) : 'N/A'} icon={

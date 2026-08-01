@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FiSearch, FiStar, FiRefreshCw, FiX, FiMapPin } from 'react-icons/fi';
+import { FiSearch, FiStar, FiX, FiMapPin } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import useWeather from '../hooks/useWeather';
@@ -12,7 +12,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 const Dashboard = () => {
   const { user } = useAuth();
   const { success, error: showError } = useToast();
-  const { weather, loading, error, searchWeather, clearWeather, setError } = useWeather();
+  const { weather, loading, error, searchWeather, setError } = useWeather();
   const [favourites, setFavourites] = useState([]);
   const [loadingFavourites, setLoadingFavourites] = useState(true);
 

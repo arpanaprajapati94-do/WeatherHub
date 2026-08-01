@@ -3,10 +3,12 @@
  * Catches all errors and returns consistent error responses
  */
 const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err.message.red.underline);
+  // Guard against undefined err/err.message (e.g. express.json parse failures)
+  const message = (err && err.message) || 'Internal Server Error';
+  console.error('Error:', message.red.underline);
 
   // Log full error stack in development
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' && err && err.stack) {
     console.error('Stack:', err.stack);
   }
 

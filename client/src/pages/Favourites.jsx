@@ -30,7 +30,13 @@ const FavouritesPage = () => {
 
   const handleCityClick = async (fav) => {
     setSelectedCity(fav);
-    await searchWeather(fav.city);
+    try {
+      await searchWeather(fav.city);
+    } catch (err) {
+      // searchWeather throws on failure — surface a friendly error instead of
+      // letting the rejection go unhandled.
+      showError(err.displayMessage || 'Failed to load weather for this city');
+    }
   };
 
   const handleRemoveFavourite = async (fav) => {

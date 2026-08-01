@@ -41,11 +41,33 @@ const Footer = () => {
             <ul className="space-y-3">
               {[
                 { to: '/', label: 'Home' },
+                { to: '/dashboard', label: 'Dashboard' },
+                { to: '/favourites', label: 'Favourites' },
                 { to: '/about', label: 'About' },
                 { to: '/contact', label: 'Contact' },
-                { to: '/dashboard', label: 'Dashboard' },
               ].map((link) => (
                 <li key={link.to}>
+                  <Link to={link.to}
+                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Product */}
+          <div className="hidden md:block">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 uppercase tracking-wider">Product</h3>
+            <ul className="space-y-3">
+              {[
+                { to: '/dashboard', label: 'Live Weather' },
+                { to: '/favourites', label: 'Air Quality' },
+                { to: '/favourites', label: 'Weather Maps' },
+                { to: '/about', label: 'Analytics' },
+                { to: '/register', label: 'Get Started' },
+              ].map((link) => (
+                <li key={link.label}>
                   <Link to={link.to}
                     className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors">
                     {link.label}
