@@ -13,8 +13,11 @@ const register = async (req, res, next) => {
     const normalizedEmail = (email || '').trim().toLowerCase();
     const normalizedName = (name || '').trim();
 
+    console.log(`[AUTH] Register attempt received for email: ${normalizedEmail}`);
+
     // Validate required fields (Mongoose will also validate, but fail fast for better UX)
     if (!normalizedName || !normalizedEmail || !password) {
+      console.log(`[AUTH] Register rejected: missing required fields (email=${normalizedEmail})`);
       return res.status(400).json({
         success: false,
         message: 'Please provide name, email, and password.',
@@ -24,6 +27,7 @@ const register = async (req, res, next) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
+      console.log(`[AUTH] Register rejected: email already exists (${normalizedEmail})`);
       return res.status(400).json({
         success: false,
         message: 'An account with this email already exists.',
@@ -32,9 +36,11 @@ const register = async (req, res, next) => {
 
     // Create new user
     const user = await User.create({ name: normalizedName, email: normalizedEmail, password });
+    console.log(`[AUTH] User created successfully — ID: ${user._id}, email: ${normalizedEmail}`);
 
     // Generate token
     const token = user.generateToken();
+    console.log(`[AUTH] JWT generated for user ID: ${user._id}`);
 
     res.status(201).json({
       success: true,
@@ -45,6 +51,7 @@ const register = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error(`[AUTH] Register error: ${error.message}`);
     next(error);
   }
 };

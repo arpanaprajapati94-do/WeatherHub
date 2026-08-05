@@ -20,17 +20,14 @@ const Dashboard = () => {
     loading, error, searchWeather, setError,
   } = useWeather();
   const [favourites, setFavourites] = useState([]);
-  const [loadingFavourites, setLoadingFavourites] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
 
-const loadFavourites = async () => {
+  const loadFavourites = async () => {
     try {
       const res = await favouritesAPI.getAll();
       setFavourites(res.data.data || []);
     } catch (err) {
       console.error('Failed to load favourites:', err);
-    } finally {
-      setLoadingFavourites(false);
     }
   };
 
@@ -38,7 +35,7 @@ const loadFavourites = async () => {
 
   const handleSearch = async (city) => {
     try { await searchWeather(city); }
-    catch (err) { /* Error is set in the hook */ }
+    catch { /* Error is set in the hook */ }
   };
 
   const handleToggleFavourite = useCallback(async () => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUser, FiLock, FiClock, FiHeart, FiSearch, FiTrash2, FiAlertTriangle, FiShield } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
@@ -21,13 +21,7 @@ const Profile = () => {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    if (user) setProfileData({ name: user.name || '', email: user.email || '' });
-    loadStats();
-    loadHistory();
-  }, [user]);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       const [favRes, histRes] = await Promise.all([favouritesAPI.getAll(), historyAPI.getAll()]);
       setStats({
@@ -35,15 +29,21 @@ const Profile = () => {
         searches: histRes.data.count ?? histRes.data.data?.length ?? 0,
       });
     } catch (err) { console.error('Failed to load stats:', err); }
-  };
+  }, []);
 
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     try {
       const res = await historyAPI.getAll();
       setHistory(res.data.data || []);
     } catch (err) { console.error('Failed to load history:', err); }
     finally { setLoadingHistory(false); }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (user) setProfileData({ name: user.name || '', email: user.email || '' });
+    loadStats();
+    loadHistory();
+  }, [user, loadStats, loadHistory]);
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -76,7 +76,7 @@ const Profile = () => {
       setHistory([]);
       setStats((prev) => ({ ...prev, searches: 0 }));
       success('Search history cleared');
-    } catch (err) { showError('Failed to clear history'); }
+    } catch { showError('Failed to clear history'); }
   };
 
   const handleDeleteAccount = async () => {
@@ -379,4 +379,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

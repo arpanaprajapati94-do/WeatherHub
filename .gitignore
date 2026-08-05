@@ -37,3 +37,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# GitHub CLI local tools (download artifacts)
+gh-tools/
+gh.zip
