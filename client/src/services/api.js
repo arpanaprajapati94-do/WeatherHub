@@ -5,9 +5,28 @@ import axios from 'axios';
  * Automatically attaches JWT token and handles errors
  */
 
-// Fall back to same-origin `/api` when VITE_API_URL is not set.
-// In development, Vite's proxy forwards `/api` → http://localhost:5000.
-const API_URL = import.meta.env.VITE_API_URL || '';
+// Determine the backend API origin.
+// Priority:
+//   1. VITE_API_URL (set explicitly in .env / hosting dashboard)
+//   2. In development → same-origin `/api`, handled by Vite's proxy → http://localhost:5000
+//   3. In production → the deployed Render backend (NEVER fall back to same-origin, because the
+//      frontend (Vercel) and backend (Render) live on different domains).
+const PROD_API_URL = 'https://weatherhub-mdip.onrender.com';
+
+const getApiBase = () => {
+  const configured = import.meta.env.VITE_API_URL?.trim();
+  if (configured) return configured;
+
+  if (import.meta.env.PROD) {
+    // Production frontend must call the Render backend, not same-origin /api
+    return PROD_API_URL;
+  }
+
+  // Development: same origin, Vite proxies /api → http://localhost:5000
+  return '';
+};
+
+const API_URL = getApiBase();
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,

@@ -174,6 +174,51 @@ NODE_ENV=development
 
 ---
 
+## 🚀 Production Deployment
+
+The app is split across two hosts in production:
+- **Frontend** → Vercel (`https://weather-hub-nine.vercel.app`)
+- **Backend API** → Render (`https://weatherhub-mdip.onrender.com`)
+
+Because the frontend and backend live on **different domains**, the frontend must be told the absolute URL of the backend. This is controlled by `VITE_API_URL`.
+
+### 🔧 Vercel (Frontend) environment variables
+Set these in **Vercel → Project → Settings → Environment Variables**:
+
+```env
+VITE_API_URL=https://weatherhub-mdip.onrender.com
+```
+
+> The client code uses `VITE_API_URL` if present; otherwise, in production builds it automatically falls back to the Render backend URL. Setting it explicitly is the recommended, safest approach.
+
+### 🔧 Render (Backend) environment variables
+Set these in **Render → Service → Environment**:
+
+```env
+NODE_ENV=production
+PORT=10000
+MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/weatherhub
+JWT_SECRET=your_long_random_secret
+JWT_EXPIRE=7d
+WEATHER_API_KEY=your_openweather_api_key
+CLIENT_URL=https://weather-hub-nine.vercel.app
+```
+
+> `MONGO_URI` must point to the **same MongoDB Atlas cluster & database** you are checking. The database name appears after the last `/` in the connection string (e.g. `/weatherhub`).
+
+### ✅ Verify the fix
+After setting env vars and redeploying:
+1. Open the deployed frontend → register a new account.
+2. Check **Render logs** — you should see:
+   - `MongoDB Connected: ...`
+   - `Database: <your-db-name>`
+   - `[AUTH] Register attempt received for email: ...`
+   - `[AUTH] User created successfully — ID: ...`
+   - `[AUTH] JWT generated for user ID: ...`
+3. Confirm the new user appears in **MongoDB Atlas** under the `users` collection.
+
+---
+
 ## 📡 API Reference
 
 Base URL: `http://localhost:5000/api`

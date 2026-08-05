@@ -17,7 +17,13 @@ const connectDB = async () => {
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 5000, // Fail fast if the DB is unreachable
     });
-    console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline.bold);
+
+    // Log connection details (NO secrets — only host + database name)
+    const dbName = conn.connection.name || 'unknown';
+    const dbHost = conn.connection.host || 'unknown';
+    console.log(`MongoDB Connected: ${dbHost}`.cyan.underline.bold);
+    console.log(`Database: ${dbName}`.green);
+    console.log(`Mongoose readyState: ${conn.connection.readyState}`.magenta);
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`.red.underline.bold);
     process.exit(1);
