@@ -43,6 +43,7 @@ const Footer = () => {
                 { to: '/', label: 'Home' },
                 { to: '/dashboard', label: 'Dashboard' },
                 { to: '/favourites', label: 'Favourites' },
+                { to: '/compare', label: 'Compare Cities' },
                 { to: '/calendar', label: 'Weather Calendar' },
                 { to: '/about', label: 'About' },
                 { to: '/contact', label: 'Contact' },
@@ -64,6 +65,8 @@ const Footer = () => {
               {[
                 { to: '/dashboard', label: 'Live Weather' },
                 { to: '/favourites', label: 'Favourite Cities' },
+                { to: '/compare', label: 'Compare Cities' },
+                { to: '/calendar', label: 'Weather Calendar' },
                 { to: '/about', label: 'About Us' },
                 { to: '/register', label: 'Get Started' },
                 { to: '/faq', label: 'FAQ' },

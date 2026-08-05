@@ -1,8 +1,11 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTemperature, convertTemp } from '../context/TemperatureContext';
+import WeatherIcon from './WeatherIcon';
 
 const WeatherCard = ({ weather, isFavourite = false, onToggleFavourite, onRefresh }) => {
-  const [imgError, setImgError] = useState(false);
+  const { unit } = useTemperature();
+  const unitSymbol = unit === 'f' ? '°F' : '°C';
+  const t = (c) => convertTemp(c, unit);
 
   if (!weather) return null;
 
@@ -105,34 +108,22 @@ const WeatherCard = ({ weather, isFavourite = false, onToggleFavourite, onRefres
       {/* Main Weather Display */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-center gap-6 mb-8 relative z-10">
         <div className="flex items-center gap-4">
-          {!imgError ? (
-            <motion.img
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              src={`https://openweathermap.org/img/wn/${icon}@4x.png`}
-              alt={description}
-              className="w-24 h-24 md:w-32 md:h-32 weather-icon-hover drop-shadow-lg"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center text-6xl">🌤️</div>
-          )}
+          <WeatherIcon icon={icon} size={96} className="weather-icon-hover drop-shadow-lg" />
           <div className="text-center md:text-left">
             <div className="flex items-start">
               <span className="text-6xl md:text-7xl font-extrabold text-gray-900 dark:text-gray-100 leading-none">
-                {temperature}
+                {t(temperature)}
               </span>
-              <span className="text-3xl md:text-4xl font-bold text-gray-500 dark:text-gray-400 mt-2">°C</span>
+              <span className="text-3xl md:text-4xl font-bold text-gray-500 dark:text-gray-400 mt-2">{unitSymbol}</span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Feels like {feelsLike}°C</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Feels like {t(feelsLike)}{unitSymbol}</p>
           </div>
         </div>
 
         <div className="flex-1 grid grid-cols-2 gap-3 w-full">
           <motion.div variants={itemVariants} className="glass-card p-3 text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Min / Max</p>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{tempMin}° / {tempMax}°C</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t(tempMin)}° / {t(tempMax)}{unitSymbol}</p>
           </motion.div>
           <motion.div variants={itemVariants} className="glass-card p-3 text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Humidity</p>
@@ -151,7 +142,7 @@ const WeatherCard = ({ weather, isFavourite = false, onToggleFavourite, onRefres
 
       {/* Additional Details */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10">
-        <DetailItem label="Feels Like" value={`${feelsLike}°C`} icon={
+        <DetailItem label="Feels Like" value={`${t(feelsLike)}${unitSymbol}`} icon={
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
         } />
         <DetailItem label="Visibility" value={`${(visibility / 1000).toFixed(1)} km`} icon={

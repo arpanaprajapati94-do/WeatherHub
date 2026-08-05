@@ -21,6 +21,7 @@ const FAQ = lazy(() => import('./pages/FAQ'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const WeatherCalendar = lazy(() => import('./pages/WeatherCalendar'));
+const Compare = lazy(() => import('./pages/Compare'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PageLoader = () => (
@@ -103,6 +104,14 @@ const App = () => {
           element={
             <Suspense fallback={<PageLoader />}>
               <WeatherCalendar />
+            </Suspense>
+          }
+        />
+        <Route
+          path="compare"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <Compare />
             </Suspense>
           }
         />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiNavigation, FiMapPin } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { weatherAPI } from '../services/api';
 import CountUp from '../components/home/CountUp';
@@ -16,6 +16,13 @@ import ChartsSection from '../components/home/ChartsSection';
 import Testimonials from '../components/home/Testimonials';
 import FaqSection from '../components/home/FaqSection';
 import CtaBanner from '../components/home/CtaBanner';
+import CitySearch from '../components/CitySearch';
+import LiveClock from '../components/LiveClock';
+import WeatherSummary from '../components/WeatherSummary';
+import PopularCitiesCarousel from '../components/PopularCitiesCarousel';
+import useWeatherTheme from '../hooks/useWeatherTheme';
+import useGeolocation from '../hooks/useGeolocation';
+import { useToast } from '../context/ToastContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -36,9 +43,16 @@ const stats = [
 
 const Home = () => {
   const { isAuthenticated } = useAuth();
+  const { success, error: showError } = useToast();
   const [liveWeather, setLiveWeather] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [weatherError, setWeatherError] = useState(null);
+  const [heroWeather, setHeroWeather] = useState(null);
+  const [heroLoading, setHeroLoading] = useState(false);
+  const { locating, locateCity } = useGeolocation();
+
+  // Apply weather-conditioned accent theme (sunny/rain/snow/night/clouds)
+  useWeatherTheme(liveWeather?.main || heroWeather?.main || 'Clear', heroWeather ? heroWeather.icon?.includes('d') : liveWeather ? liveWeather.icon?.includes('d') : true);
 
   const fetchLiveWeather = useCallback(async (city = 'Ahmedabad') => {
     setWeatherLoading(true);
@@ -58,9 +72,32 @@ const Home = () => {
     fetchLiveWeather();
   }, [fetchLiveWeather]);
 
+  const handleHeroSearch = useCallback(async (city) => {
+    if (!city) return;
+    setHeroLoading(true);
+    try {
+      const res = await weatherAPI.getWeather(city);
+      setHeroWeather(res.data.data);
+    } catch (err) {
+      showError(err.displayMessage || 'Failed to load weather for that city');
+    } finally {
+      setHeroLoading(false);
+    }
+  }, [showError]);
+
+  const handleUseMyLocation = useCallback(async () => {
+    try {
+      const city = await locateCity();
+      await handleHeroSearch(city);
+      success(`Weather updated for ${city}`);
+    } catch (err) {
+      showError(err.message || 'Unable to detect your location');
+    }
+  }, [locateCity, handleHeroSearch, success, showError]);
+
   // Derive dynamic background from real weather condition
-  const backgroundCondition = liveWeather?.main || 'Clear';
-  const isDay = liveWeather ? liveWeather.icon?.includes('d') : true;
+  const backgroundCondition = liveWeather?.main || heroWeather?.main || 'Clear';
+  const isDay = heroWeather ? heroWeather.icon?.includes('d') : liveWeather ? liveWeather.icon?.includes('d') : true;
 
   return (
     <div className="min-h-screen">
@@ -105,11 +142,28 @@ const Home = () => {
 
               <motion.p
                 variants={itemVariants}
-                className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-xl mb-8"
+                className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-xl mb-6"
               >
                 Stay informed with real-time weather updates, save your favourite cities,
                 and track weather patterns with WeatherHub's modern, premium dashboard.
               </motion.p>
+
+              {/* Hero search box */}
+              <motion.div variants={itemVariants} className="w-full max-w-xl mb-8">
+                <CitySearch
+                  onSearch={handleHeroSearch}
+                  loading={heroLoading}
+                  placeholder="Search any city… try Ahmedabad, Mumbai, London"
+                />
+                <button
+                  onClick={handleUseMyLocation}
+                  disabled={locating}
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FiNavigation className="w-4 h-4" />
+                  {locating ? 'Detecting your location…' : 'Use My Location'}
+                </button>
+              </motion.div>
 
               <motion.div
                 variants={itemVariants}
@@ -171,13 +225,15 @@ const Home = () => {
             </motion.div>
 
             {/* Right: Live weather widget */}
-            <div className="relative">
+            <div className="relative flex flex-col gap-4">
+              <LiveClock className="glass-card p-4" />
               <LiveWeatherWidget
-                weather={liveWeather}
-                loading={weatherLoading}
+                weather={heroWeather || liveWeather}
+                loading={heroLoading || weatherLoading}
                 error={weatherError}
-                onRefresh={() => fetchLiveWeather()}
+                onRefresh={() => (heroWeather ? handleHeroSearch(heroWeather.city) : fetchLiveWeather())}
               />
+              {heroWeather && <WeatherSummary weather={heroWeather} />}
             </div>
           </div>
         </div>
@@ -185,6 +241,39 @@ const Home = () => {
 
       {/* Trusted By */}
       <TrustedBy />
+
+      {/* Popular Cities */}
+      <section className="py-12 md:py-16 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8"
+          >
+            <div>
+              <span className="inline-block px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-xs font-semibold uppercase tracking-wider mb-3">
+                Trending Now
+              </span>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                Weather in <span className="gradient-text">Popular Cities</span>
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 mt-2">
+                Live conditions from around the world — tap a city to see full details.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <FiMapPin className="w-4 h-4" />
+              Scroll to explore →
+            </div>
+          </motion.div>
+
+          <PopularCitiesCarousel
+            count={10}
+            onSelect={(city) => handleHeroSearch(city)}
+          />
+        </div>
+      </section>
 
       {/* Dashboard Preview */}
       <section className="py-16 md:py-24 relative">

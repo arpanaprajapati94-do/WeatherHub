@@ -15,9 +15,7 @@ const FavouritesPage = () => {
   const { success, error: showError } = useToast();
   const { weather, loading: weatherLoading, searchWeather, clearWeather } = useWeather();
 
-  useEffect(() => { loadFavourites(); }, []);
-
-  const loadFavourites = async () => {
+const loadFavourites = async () => {
     try {
       const res = await favouritesAPI.getAll();
       setFavourites(res.data.data || []);
@@ -27,6 +25,8 @@ const FavouritesPage = () => {
       setLoadingFavourites(false);
     }
   };
+
+  useEffect(() => { loadFavourites(); }, []);
 
   const handleCityClick = async (fav) => {
     setSelectedCity(fav);

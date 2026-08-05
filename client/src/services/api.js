@@ -123,6 +123,27 @@ export const weatherAPI = {
       },
     }),
 
+  getForecast: (city) =>
+    api.get('/weather/forecast', {
+      params: {
+        city,
+      },
+    }),
+
+  getAirQuality: (city) =>
+    api.get('/weather/air-quality', {
+      params: {
+        city,
+      },
+    }),
+
+  getAlerts: (city) =>
+    api.get('/weather/alerts', {
+      params: {
+        city,
+      },
+    }),
+
 };
 
 

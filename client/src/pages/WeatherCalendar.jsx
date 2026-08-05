@@ -5,6 +5,7 @@ import {
   FiSunrise, FiSunset, FiActivity, FiCalendar,
 } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
+import { useTemperature, convertTemp } from '../context/TemperatureContext';
 import { weatherAPI } from '../services/api';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -39,16 +40,15 @@ const CONDITIONS = [
 
 const primaryIndex = (main) => CONDITIONS.findIndex((c) => c.main === main);
 
-const buildMonth = (city, year, month) => {
+const buildMonth = (city, year, month, liveCondition = 'Clear') => {
   const base = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const startDay = base.getDay();
 
   const seed = seedFrom(`${city}-${year}-${month}`);
   const rand = mulberry32(seed);
-  const liveIdx = primaryIndex('Clear') >= 0 ? 0 : 0;
   // Bias the month's weather toward the current live condition when available
-  const bias = liveIdx;
+  const bias = primaryIndex(liveCondition) >= 0 ? primaryIndex(liveCondition) : 0;
 
   const days = [];
   for (let d = 1; d <= daysInMonth; d++) {
@@ -106,6 +106,9 @@ const WeatherCalendar = () => {
   const [liveTemp, setLiveTemp] = useState(null);
   const [loading, setLoading] = useState(true);
   const { error: toastError } = useToast();
+  const { unit } = useTemperature();
+  const unitSymbol = unit === 'f' ? '°F' : '°C';
+  const t = (c) => convertTemp(c, unit);
 
   const fetchLive = useCallback(async () => {
     setLoading(true);
@@ -128,7 +131,7 @@ const WeatherCalendar = () => {
 
   const monthData = useMemo(() => {
     // Bias the generator toward the live condition by mixing it into the seed
-    return buildMonth(`${prevCity}-${liveCondition}`, year, month);
+    return buildMonth(prevCity, year, month, liveCondition);
   }, [prevCity, liveCondition, year, month]);
 
   const stats = useMemo(() => monthStats(monthData.days), [monthData]);
@@ -223,7 +226,7 @@ const WeatherCalendar = () => {
                 {city}
                 {liveTemp !== null && (
                   <span className="ml-1 text-xs font-semibold text-blue-500 dark:text-blue-400">
-                    • Now {liveTemp}°C
+                    • Now {t(liveTemp)}{unitSymbol}
                   </span>
                 )}
               </p>
@@ -279,7 +282,7 @@ const WeatherCalendar = () => {
                   <span className={`text-xs md:text-sm font-bold ${isToday(day) ? 'text-white' : ''}`}>{day.date}</span>
                   <span className={`text-base md:text-xl leading-none mt-1 ${isToday(day) ? '' : day.color}`}>{day.icon}</span>
                   <span className={`text-[10px] md:text-xs font-medium mt-0.5 ${isToday(day) ? 'text-white/90' : 'text-gray-500 dark:text-gray-400'}`}>
-                    {day.temp}°
+                    {t(day.temp)}°
                   </span>
                 </motion.button>
               ) : (
@@ -294,9 +297,9 @@ const WeatherCalendar = () => {
             <SummaryStat icon="🌧️" label="Rainy Days" value={stats.rainy} />
             <SummaryStat icon="☁️" label="Cloudy Days" value={stats.cloudy} />
             <div className="glass-card p-3 text-center">
-              <p className="text-xl font-bold gradient-text">{stats.avg}°C</p>
+              <p className="text-xl font-bold gradient-text">{t(stats.avg)}{unitSymbol}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Avg • H:{stats.max}° L:{stats.min}°
+                Avg • H:{t(stats.max)}° L:{t(stats.min)}°
               </p>
             </div>
           </div>
@@ -338,7 +341,7 @@ const WeatherCalendar = () => {
               </div>
 
               <p className="text-5xl font-extrabold gradient-text mb-6">
-                {selectedDay.temp}°C
+                {t(selectedDay.temp)}{unitSymbol}
               </p>
 
               <div className="grid grid-cols-2 gap-3">

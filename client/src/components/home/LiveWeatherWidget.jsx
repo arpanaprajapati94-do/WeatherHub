@@ -1,13 +1,16 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiMapPin, FiDroplet, FiWind, FiActivity, FiSunrise, FiSunset, FiRefreshCw } from 'react-icons/fi';
+import WeatherIcon from '../WeatherIcon';
+import { useTemperature, convertTemp } from '../../context/TemperatureContext';
 
 /**
  * Live weather widget for the hero section.
  * Receives real weather data from the parent (Home), fetched via the public API.
  */
 const LiveWeatherWidget = ({ weather, loading = false, error = null, onRefresh }) => {
-  const [imgError, setImgError] = useState(false);
+  const { unit } = useTemperature();
+  const unitSymbol = unit === 'f' ? '°F' : '°C';
+  const t = (c) => convertTemp(c, unit);
 
   const formatTime = (ts, tz) => {
     if (!ts) return '--';
@@ -15,12 +18,10 @@ const LiveWeatherWidget = ({ weather, loading = false, error = null, onRefresh }
     return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
   };
 
-  const iconUrl = (code) => `https://openweathermap.org/img/wn/${code}@2x.png`;
-
   const hourly = weather
     ? [0, 1, 2, 3, 4, 5].map((i) => ({
         label: new Date(Date.now() + i * 3600 * 1000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-        temp: Math.round(weather.temperature + ((i % 3) - 1)),
+        temp: weather.temperature + ((i % 3) - 1),
         icon: weather.icon,
       }))
     : [];
@@ -86,7 +87,8 @@ const LiveWeatherWidget = ({ weather, loading = false, error = null, onRefresh }
         {onRefresh && (
           <button
             onClick={onRefresh}
-            className="btn-icon text-gray-400 hover:text-blue-500 transition-colors"
+            aria-label="Refresh weather"
+            className="btn-icon text-gray-400 hover:text-blue-500 hover:rotate-180 transition-all duration-300"
             title="Refresh"
           >
             <FiRefreshCw className="w-4 h-4" />
@@ -105,22 +107,13 @@ const LiveWeatherWidget = ({ weather, loading = false, error = null, onRefresh }
 
       {/* Temperature */}
       <div className="flex items-center gap-4 mb-6 relative z-10">
-        {!imgError ? (
-          <img
-            src={iconUrl(weather.icon)}
-            alt={weather.description}
-            onError={() => setImgError(true)}
-            className="w-20 h-20 weather-icon-hover drop-shadow-lg"
-          />
-        ) : (
-          <div className="w-20 h-20 flex items-center justify-center text-5xl">🌤️</div>
-        )}
+        <WeatherIcon icon={weather.icon} size={80} className="weather-icon-hover drop-shadow-lg" />
         <div>
           <div className="flex items-start">
             <span className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-gray-100 leading-none">
-              {weather.temperature}
+              {t(weather.temperature)}
             </span>
-            <span className="text-2xl font-bold text-gray-500 dark:text-gray-400 mt-1">°C</span>
+            <span className="text-2xl font-bold text-gray-500 dark:text-gray-400 mt-1">{unitSymbol}</span>
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{weather.description}</p>
         </div>
@@ -160,16 +153,12 @@ const LiveWeatherWidget = ({ weather, loading = false, error = null, onRefresh }
         <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
           Hourly Forecast
         </p>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
           {hourly.map((h, i) => (
             <div key={i} className="flex-shrink-0 glass-card px-3 py-2 text-center min-w-[64px]">
               <p className="text-[10px] text-gray-500 dark:text-gray-400">{h.label}</p>
-              {!imgError ? (
-                <img src={iconUrl(h.icon)} alt="" className="w-7 h-7 mx-auto my-0.5" />
-              ) : (
-                <span className="block w-7 h-7 mx-auto my-0.5 text-sm">🌤️</span>
-              )}
-              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{h.temp}°</p>
+              <WeatherIcon icon={h.icon} size={28} className="w-7 h-7 mx-auto my-0.5" />
+              <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{t(h.temp)}{unitSymbol}</p>
             </div>
           ))}
         </div>

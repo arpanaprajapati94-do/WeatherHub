@@ -5,6 +5,7 @@ import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ThemeToggle';
+import TemperatureToggle from './TemperatureToggle';
 import Logo from './Logo';
 
 const Navbar = () => {
@@ -21,11 +22,13 @@ const Navbar = () => {
     ? [
         { to: '/dashboard', label: 'Dashboard' },
         { to: '/favourites', label: 'Favourites' },
+        { to: '/compare', label: 'Compare' },
         { to: '/calendar', label: 'Calendar' },
       ]
     : [
         { to: '/', label: 'Home' },
         { to: '/about', label: 'About' },
+        { to: '/compare', label: 'Compare' },
         { to: '/calendar', label: 'Calendar' },
         { to: '/contact', label: 'Contact' },
       ];
@@ -68,6 +71,7 @@ const Navbar = () => {
 
           {/* Right Side */}
           <div className="flex items-center gap-2">
+            <TemperatureToggle compact />
             <ThemeToggle />
 
             {isAuthenticated ? (
