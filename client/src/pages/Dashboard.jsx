@@ -1,24 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FiSearch, FiStar, FiX, FiMapPin } from 'react-icons/fi';
+import { FiSearch, FiStar, FiX, FiMapPin, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import useWeather from '../hooks/useWeather';
 import { favouritesAPI } from '../services/api';
 import CitySearch from '../components/CitySearch';
 import WeatherCard from '../components/WeatherCard';
+import ForecastSection from '../components/ForecastSection';
+import AirQualityWidget from '../components/AirQualityWidget';
+import WeatherAlerts from '../components/WeatherAlerts';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { success, error: showError } = useToast();
-  const { weather, loading, error, searchWeather, setError } = useWeather();
+  const {
+    weather, forecast, airQuality, alerts,
+    loading, error, searchWeather, setError,
+  } = useWeather();
   const [favourites, setFavourites] = useState([]);
   const [loadingFavourites, setLoadingFavourites] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
 
-  useEffect(() => { loadFavourites(); }, []);
-
-  const loadFavourites = async () => {
+const loadFavourites = async () => {
     try {
       const res = await favouritesAPI.getAll();
       setFavourites(res.data.data || []);
@@ -28,6 +33,8 @@ const Dashboard = () => {
       setLoadingFavourites(false);
     }
   };
+
+  useEffect(() => { loadFavourites(); }, []);
 
   const handleSearch = async (city) => {
     try { await searchWeather(city); }
@@ -119,6 +126,34 @@ const Dashboard = () => {
               onToggleFavourite={handleToggleFavourite}
               onRefresh={handleRefresh}
             />
+
+            {/* Extended details toggle */}
+            <button
+              onClick={() => setShowDetails((prev) => !prev)}
+              className="mt-4 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+            >
+              {showDetails ? (
+                <>
+                  <FiChevronDown className="w-4 h-4 rotate-180 transition-transform" />
+                  Hide forecast, air quality & alerts
+                </>
+              ) : (
+                <>
+                  <FiChevronDown className="w-4 h-4 transition-transform" />
+                  Show 7-day forecast, air quality & alerts
+                </>
+              )}
+            </button>
+
+            {showDetails && (
+              <div className="mt-4 space-y-6">
+                <ForecastSection data={forecast} loading={false} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <AirQualityWidget data={airQuality} />
+                  <WeatherAlerts data={alerts} />
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 

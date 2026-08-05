@@ -34,7 +34,7 @@ const HighlightMatch = ({ text, query }) => {
   );
 };
 
-const CitySearch = ({ onSearch, loading = false }) => {
+const CitySearch = ({ onSearch, loading = false, placeholder = 'Search for a city (e.g., Ahmedabad, London, Tokyo)...' }) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -193,6 +193,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
   };
 
   // Determine what to show in the dropdown
+  // suppressDropdown blocks reopening right after select/search/escape/outside-click.
   const showDropdown = !suppressDropdown && (isOpen || showRecent || (hasQuery && filteredCities.length > 0));
   const itemsToShow = hasQuery ? filteredCities : (showRecent ? recentSearches : []);
   const dropdownLabel = hasQuery
@@ -212,7 +213,7 @@ const CitySearch = ({ onSearch, loading = false }) => {
           onChange={handleInputChange}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
-          placeholder="Search for a city (e.g., Ahmedabad, London, Tokyo)..."
+          placeholder={placeholder}
           className="input pl-14 pr-36 py-4 text-base font-medium
             bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl
             border-2 border-transparent

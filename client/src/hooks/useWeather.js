@@ -7,6 +7,9 @@ import { weatherAPI, historyAPI } from '../services/api';
  */
 const useWeather = () => {
   const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState(null);
+  const [airQuality, setAirQuality] = useState(null);
+  const [alerts, setAlerts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,9 +27,46 @@ const useWeather = () => {
     setError(null);
 
     try {
-      const res = await weatherAPI.getWeather(city.trim());
+      const cityName = city.trim();
+
+      // Fetch current weather first (critical path)
+      const res = await weatherAPI.getWeather(cityName);
       const weatherData = res.data.data;
       setWeather(weatherData);
+
+      // Fetch the rest in parallel, don't block the main weather display
+      const cityForLookup = weatherData.city || cityName;
+
+      try {
+        const [forecastRes, aqiRes, alertsRes] = await Promise.allSettled([
+          weatherAPI.getForecast(cityForLookup),
+          weatherAPI.getAirQuality(cityForLookup),
+          weatherAPI.getAlerts(cityForLookup),
+        ]);
+
+        if (forecastRes.status === 'fulfilled') {
+          setForecast(forecastRes.value.data.data);
+        } else {
+          setForecast(null);
+          console.warn('Failed to load forecast:', forecastRes.reason);
+        }
+
+        if (aqiRes.status === 'fulfilled') {
+          setAirQuality(aqiRes.value.data.data);
+        } else {
+          setAirQuality(null);
+          console.warn('Failed to load air quality:', aqiRes.reason);
+        }
+
+        if (alertsRes.status === 'fulfilled') {
+          setAlerts(alertsRes.value.data.data);
+        } else {
+          setAlerts(null);
+          console.warn('Failed to load alerts:', alertsRes.reason);
+        }
+      } catch (secondaryErr) {
+        console.warn('Failed to load secondary weather data:', secondaryErr);
+      }
 
       // Save to search history (fire-and-forget, don't block UI)
       try {
@@ -47,6 +87,9 @@ const useWeather = () => {
       const message = err.displayMessage || 'Failed to fetch weather data';
       setError(message);
       setWeather(null);
+      setForecast(null);
+      setAirQuality(null);
+      setAlerts(null);
       throw err;
     } finally {
       setLoading(false);
@@ -58,11 +101,17 @@ const useWeather = () => {
    */
   const clearWeather = useCallback(() => {
     setWeather(null);
+    setForecast(null);
+    setAirQuality(null);
+    setAlerts(null);
     setError(null);
   }, []);
 
   return {
     weather,
+    forecast,
+    airQuality,
+    alerts,
     loading,
     error,
     searchWeather,

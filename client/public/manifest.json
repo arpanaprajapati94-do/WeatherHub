@@ -1,0 +1,37 @@
+{
+  "name": "WeatherHub — Real-Time Weather Dashboard",
+  "short_name": "WeatherHub",
+  "description": "Your personal weather companion. Real-time weather updates, forecasts, air quality, and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1026",
+  "theme_color": "#0B1026",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "Open your weather dashboard"
+    },
+    {
+      "name": "Compare Cities",
+      "url": "/compare",
+      "description": "Compare weather across cities"
+    }
+  ]
+}
+
