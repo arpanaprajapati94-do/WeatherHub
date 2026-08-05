@@ -43,9 +43,7 @@ const App = () => {
         {/* Public Routes */}
         <Route
           index
-          element={
-            isAuthenticated ? <Navigate to="/dashboard" replace /> : <Home />
-          }
+          element={<Home />}
         />
         <Route
           path="login"
