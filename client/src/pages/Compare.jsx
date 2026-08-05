@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FiMapPin, FiX, FiDroplet, FiWind, FiActivity, FiPlus, FiThermometer } from 'react-icons/fi';
 import CitySearch from '../components/CitySearch';
 import { weatherAPI } from '../services/api';

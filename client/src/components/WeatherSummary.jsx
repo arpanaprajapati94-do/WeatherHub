@@ -31,7 +31,7 @@ const WeatherSummary = ({ weather }) => {
       tempC >= 5 ? 'cool' :
       tempC >= 0 ? 'cold' : 'freezing';
 
-    let advice = '';
+    let advice;
     if (['rain', 'drizzle', 'thunderstorm'].includes(main)) {
       advice = 'Carry an umbrella and drive carefully.';
     } else if (main === 'snow') {

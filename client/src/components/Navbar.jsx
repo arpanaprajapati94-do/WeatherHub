@@ -3,14 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX, FiUser, FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 import TemperatureToggle from './TemperatureToggle';
 import Logo from './Logo';
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
-  const { theme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

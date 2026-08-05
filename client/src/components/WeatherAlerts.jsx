@@ -11,11 +11,14 @@ const WeatherAlerts = ({ data, loading = false, error = null }) => {
   const [dismissed, setDismissed] = useState([]);
 
   const allAlerts = data?.alerts || [];
-  // Filter out any alerts the user has dismissed
-  const alerts = allAlerts.filter((_, i) => !dismissed.includes(`${allAlerts[i].title}-${i}`));
+  // Attach a stable, original-index-based key to each alert so that dismissing
+  // one alert always removes the correct entry even after previous dismissals
+  // (neither the visible index nor the filtered index can be relied on).
+  const alerts = allAlerts
+    .map((alert, i) => ({ alert, key: `${alert.title}-${i}` }))
+    .filter(({ key }) => !dismissed.includes(key));
 
-  const dismissAlert = (alert, i) => {
-    const key = `${alert.title}-${i}`;
+  const dismissAlert = (key) => {
     setDismissed((prev) => (prev.includes(key) ? prev : [...prev, key]));
   };
 
@@ -63,7 +66,7 @@ const WeatherAlerts = ({ data, loading = false, error = null }) => {
     );
   }
 
-  const highSeverity = alerts.filter((a) => a.severity === 'high');
+  const highSeverity = alerts.filter((a) => a.alert.severity === 'high');
   const visible = expanded ? alerts : alerts.slice(0, 2);
 
   const severityColor = {
@@ -111,9 +114,9 @@ const WeatherAlerts = ({ data, loading = false, error = null }) => {
       {/* Alerts list */}
       <div className="space-y-2">
         <AnimatePresence>
-          {visible.map((alert, i) => (
+          {visible.map(({ alert, key }, i) => (
             <motion.div
-              key={`${alert.title}-${i}`}
+              key={key}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
@@ -129,7 +132,7 @@ const WeatherAlerts = ({ data, loading = false, error = null }) => {
                 <p className="text-xs mt-1 opacity-80 leading-relaxed">{alert.message}</p>
               </div>
               <button
-                onClick={() => dismissAlert(alert, i)}
+                onClick={() => dismissAlert(key)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 opacity-60"
                 aria-label="Dismiss"
               >

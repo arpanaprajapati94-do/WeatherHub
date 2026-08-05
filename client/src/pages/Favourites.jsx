@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiStar, FiTrash2, FiArrowLeft } from 'react-icons/fi';
@@ -15,18 +15,18 @@ const FavouritesPage = () => {
   const { success, error: showError } = useToast();
   const { weather, loading: weatherLoading, searchWeather, clearWeather } = useWeather();
 
-const loadFavourites = async () => {
+  const loadFavourites = useCallback(async () => {
     try {
       const res = await favouritesAPI.getAll();
       setFavourites(res.data.data || []);
-    } catch (err) {
+    } catch {
       showError('Failed to load favourites');
     } finally {
       setLoadingFavourites(false);
     }
-  };
+  }, [showError]);
 
-  useEffect(() => { loadFavourites(); }, []);
+  useEffect(() => { loadFavourites(); }, [loadFavourites]);
 
   const handleCityClick = async (fav) => {
     setSelectedCity(fav);
